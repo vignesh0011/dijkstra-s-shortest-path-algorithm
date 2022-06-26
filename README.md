@@ -1,12 +1,13 @@
-# Dijkstra's Shortest Path Algorithm
+## EX.NO: 03
+## DATE: 10-05-2022
+## <p align="center">Dijkstra's Shortest Path Algorithm</P>
+
 ## AIM
 
 To develop a code to find the shortest route from the source to the destination point using Dijkstra's shortest path algorithm.
 
 ## THEORY
-To implement Best-First_Search ( BFS ) algorithm to find the route between an initial state to a final state. Something like google maps. We create a dictionary to act as the dataset for the search alogrithm, containing all the distances between all the nodes ( Places ).
-
-
+Best-first search algorithm always selects the path which appears best at that moment. It is the combination of depth-first search and breadth-first search algorithms. Best-first search allows us to take the advantages of both algorithms. With the help of best-first search, at each step, we can choose the most promising node. In the best first search algorithm, we expand the node which is closest to the goal node. The best first search uses the concept of a priority queue. It is a search algorithm that works on a specific rule. The aim is to reach the goal from the initial state via the shortest path. Best First Search is an algorithm for finding the shortest path from a given starting node to a goal node in a graph. The algorithm works by expanding the nodes of the graph in order of increasing the distance from the starting node until the goal node is reached.
 
 ## DESIGN STEPS
 
@@ -17,25 +18,27 @@ Identify a location in the google map:
 Select a specific number of nodes with distance
 
 ### STEP 3:
-Create a dictionary with all the node pairs (keys) and their respective distances as the values
+Start from the initial node and put it in the ordered list.
 
 ### STEP 4:
-Implement the search algorithm by passing any node and f(node) to find the Best route.
+Repeat the next steps until the GOAL node is reached:
 
-### STEP 5:
-Display the route sequence.
+a) If the list is empty, then EXIT the loop returning ‘False’
+
+b) Select the first/top node in the list and move it to the another list. Also, consider the information of the parent node.
+
+c) If the selected node is a GOAL node, then move the node to the list and exit the loop returning ‘True’. The solution can be found by backtracking the path.
+
+d) If the selected node is not the GOAL node, expand node to generate the ‘immediate’ next nodes linked to node and add all those to the list.
 
 
 ## ROUTE MAP
-#### Include your own map
-#### Example map
-![166117310-3cf0ff9c-1f7d-4278-a344-3e454584b5f0](https://user-images.githubusercontent.com/75236145/167675024-458dd585-a5d5-47cf-9e19-a1a186011ef9.png)
-
+![WhatsApp Image 2022-05-01 at 9 56 54 PM](https://user-images.githubusercontent.com/75234588/166159420-b0cca715-d1cd-4e4f-87ab-1c48054fc5c9.jpeg)
 
 ## PROGRAM
-```python
-Student name : M VIGNESH
-Reg.no : 212220233002
+```
+Name: M Vignesh
+Reg. No: 212220233002
 ```
 ```python
 %matplotlib inline
@@ -70,7 +73,7 @@ class Problem(object):
         return '{0}({1}, {2})'.format(
             type(self).__name__, self.initial, self.goal)
             
-    class Node:
+class Node:
     "A Node in a search tree."
     def __init__(self, state, parent=None, action=None, path_cost=0):
         self.__dict__.update(state=state, parent=parent, action=action, path_cost=path_cost)
@@ -80,13 +83,12 @@ class Problem(object):
     def __len__(self): 
         return 0 if self.parent is None else (1 + len(self.parent))
     def __lt__(self, other): 
-        return self.path_cost < other.path_cost
+        return self.path_cost < other.path_cost            
         
-    
-    failure = Node('failure', path_cost=math.inf) # Indicates an algorithm couldn't find a solution.
-    cutoff  = Node('cutoff',  path_cost=math.inf) # Indicates iterative deepening search was cut off.
-    
-    def expand(problem, node):
+failure = Node('failure', path_cost=math.inf) # Indicates an algorithm couldn't find a solution.
+cutoff  = Node('cutoff',  path_cost=math.inf) # Indicates iterative deepening search was cut off.
+
+def expand(problem, node):
     "Expand a node, generating the children nodes."
     s = node.state
     for action in problem.actions(s):
@@ -130,29 +132,26 @@ class PriorityQueue:
     def top(self): return self.items[0][1]
 
     def __len__(self): return len(self.items)
-    
-    def best_first_search(problem, f):
+
+def best_first_search(problem):
     "Search nodes with minimum f(node) value first."
     node = Node(problem.initial)
-    frontier = PriorityQueue([node], key=f)
+    frontier = PriorityQueue([node])
     reached = {problem.initial: node}
     while frontier:
         node = frontier.pop()
         if problem.is_goal(node.state):
             return node
-        for child in expand(problem,node):
-            s=child.state
+        for child in expand(problem, node):
+            s= child.state
             if s not in reached or child.path_cost < reached[s].path_cost:
-                reached[s]= child
+                reached[s] = child
                 frontier.add(child)
-         
     return failure
 
 def g(n): 
-    # Write your code here ; modify the below mentioned line to find the actual cost
-    cost = 1
-    return cost
-    
+        return n.path_cost
+
 class RouteProblem(Problem):
     """A problem to find a route between locations on a `Map`.
     Create a problem with RouteProblem(start, goal, map=Map(...)}).
@@ -175,7 +174,8 @@ class RouteProblem(Problem):
         locs = self.map.locations
         return straight_line_distance(locs[node.state], locs[self.goal])
     
-   class Map:
+
+class Map:
     """A map of places in a 2D world: a graph with vertexes and links between them. 
     In `Map(links, locations)`, `links` can be either [(v1, v2)...] pairs, 
     or a {(v1, v2): distance...} dict. Optional `locations` can be {v1: (x, y)} 
@@ -198,31 +198,76 @@ def multimap(pairs) -> dict:
     for key, val in pairs:
         result[key].append(val)
     return result
-    
-   # Create your own map and define the nodes
+
 # Create your own map and define the nodes
+
 saveetha_nearby_locations = Map(
-   {('SaveethaHospital', 'Chembarambakkam'):  7, ('Chembarambakkam', 'PoonamalleeBridge'): 6, ('PoonamalleeBridge', 'PoonamalleeBusTerminus'): 1, ('PoonamalleeBridge', 'SaveethaDentalCollege'): 3, ('PoonamalleeBusTerminus', 'Kattupakkam'): 2,
-    ('PoonmalleeBusTerminal', 'Mangadu'):4, ('SaveethaDentalCollege', 'Kattupakkam'): 2, ('SaveethaDentalCollege', 'Maduravoyal'):  5, ('Maduravoyal', 'Koyambedu'): 5, ('Koyambedu', 'Vadapalani'): 5, ('Kattupakkam', 'Porur'): 4, 
-    ('Porur', 'Vadapalani'): 8, ('Vadapalani', 'Guindy'):  8, ('Porur', 'Guindy'): 10, ('Mangadu', 'Kundrathur'): 4, ('Kundrathur', 'Porur'): 9, ('Kundrathur', 'Tiruneermalai'): 7, ('Kundrathur', 'Pammal'): 6, ('Pammal', 'Porur'): 10, ('Pammal', 'Guindy'): 14, ('Pammal', 'Airport'): 6, ('Tiruneermalai', 'Balaji college'): 2, ('Balaji college', 'Chrompet'): 2, ('Guindy', 'Velachery'): 4, ('Chrompet', 'Velachery'): 12})
+    {('SaveethaHospital', 'Chembarambakkam'):  3, 
+    ('Chembarambakkam', 'PoonamalleeBridge'): 6, 
+    ('PoonamalleeBridge', 'PoonamalleeBusTerminus'): 1, 
+    ('PoonamalleeBridge', 'Seener Kupam'): 3,
+    ('Seener Kupam', 'SaveethaDentalCollege'): 3, 
+    ('PoonamalleeBusTerminus', 'Karanchavadi'): 3, 
+    ('Karanchavadi','Kumanchavadi'): 2,
+    ('Karanchavadi','Seener kupam'): 2,
+    ('Kumanachavadi', 'Kattupakkam'): 1,
+    ('SaveethaDentalCollege', 'Kumanachavadi'): 2, 
+    ('SaveethaDentalCollege', 'Maduravoyal'):  5, 
+    ('Maduravoyal', 'Koyambedu'): 5, 
+    ('Koyambedu', 'CMBT'): 1,
+    ('Koyambedu', 'Chetpet'): 6,
+    ('CMBT', 'Vadapalani'): 5,  
+    ('Kattupakkam', 'Porur link road'): 4, 
+    ('Porur link road', 'Porur'): 1,
+    ('Porur', 'Vadapalani'): 3,
+    ('Porur link road', 'Maduravoil'): 2, 
+    ('Porur', 'Vadapalani'): 4,
+    ('Vadapalani', 'T-Nagar'): 4,
+    ('Vadapalani', 'Guindy'): 6,
+    ('Vadapalani', 'Nungabakkam'): 4,
+    ('Nungabakkam','Chetpet'): 5,
+    ('T-Nagar', 'Guindy'): 7, 
+    ('Porur', 'Gundy'): 10, 
+    ('Gundy', 'ChennaiAirport'): 5})
 
-r0 = RouteProblem('Maduravoyal', 'Velachery', map=saveetha_nearby_locations)
-r1 = RouteProblem('Chembarambakkam', 'Guindy', map=saveetha_nearby_locations)
-r2 = RouteProblem('PoonamalleeBridge', 'Kundrathur', map=saveetha_nearby_locations)
-r3 = RouteProblem('SaveethaHospital', 'Kattupakkam', map=saveetha_nearby_locations)
-r4 = RouteProblem('Mangadu', 'Guindy', map=saveetha_nearby_locations)
 
-goal_state_path=best_first_search(r4,g)
+r0 = RouteProblem('SaveethaHospital', 'ChennaiAirport', map=saveetha_nearby_locations)
+r1 = RouteProblem('PoonamalleeBusTerminus', 'Koyambedu', map=saveetha_nearby_locations)
+r2 = RouteProblem('Koyambedu', 'Nungabakkam', map=saveetha_nearby_locations)
+r3 = RouteProblem('Kattupakkam', 'ChennaiAirport', map=saveetha_nearby_locations)
+r4 = RouteProblem('ChennaiAirport', 'SaveethaDentalCollege', map=saveetha_nearby_locations)
+r5 = RouteProblem('SaveethaHospital', 'Maduravoil', map=saveetha_nearby_locations)
+r6 = RouteProblem('PoonamalleeBusTerminus', 'Vadapalani', map=saveetha_nearby_locations)
+r7 = RouteProblem('Koyambedu', 'Karanchavadi', map=saveetha_nearby_locations)
+r8 = RouteProblem('Kattupakkam', 'T-Nagar', map=saveetha_nearby_locations)
+r9 = RouteProblem('Vadapalani', 'SaveethaDentalCollege', map=saveetha_nearby_locations)
+
+print(r0)
+print(r1)
+print(r2)
+print(r3)
+print(r4)
+print(r5)
+print(r6)
+print(r7)
+print(r8)
+print(r9)
+
+goal_state_path= best_first_search(r7)
 
 print("GoalStateWithPath:{0}".format(goal_state_path))
-path_states(goal_state_path) 
+
+path_states(goal_state_path)
+
 print("Total Distance={0} Kilometers".format(goal_state_path.path_cost))
 ```
 
+# OUTPUT:
+![Screenshot (73)](https://user-images.githubusercontent.com/75234588/167643755-fdc49323-b3a1-4c57-be92-9e919596bc66.png)
 
-## OUTPUT:
 
-![Screenshot (99)](https://user-images.githubusercontent.com/75236145/167674283-d5d98469-8feb-468a-841d-361b3dbcb9a5.png)
+## Justification:
+In best-first search algorithm, the selected node is verified as parent node or not and starts its search, within the least distance it will be reaching the goal node. Search near every two nodes are always considered with its shortest distance.
 
 ## RESULT:
-Hence, Best-First-Search Algorithm was implemented for a route finding problem.
+Thus an algorithm to find the route from the source to the destination point using best-first search is developed and executed successfully.
